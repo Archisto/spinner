@@ -146,7 +146,7 @@ public class Spinner : MonoBehaviour
         this.targetCount = targetCount;
         targets = new List<Target>(targetCount);
         targetSectorAngle = 360 / targetCount;
-        Target.Colors[] colors = Target.GetColorMix(targetCount);
+        Target.Colors[] colors = Target.GetColorsInOrder(targetCount);
 
         for (int i = 0; i < targetCount; i++)
         {

@@ -16,10 +16,10 @@ public class Target : MonoBehaviour
         Cyan,
         Orange,
         White,
-        Brown,
+        Purple,
         DarkGreen,
         DarkBlue,
-        Purple,
+        Brown,
         Gray
     }
 
@@ -74,6 +74,23 @@ public class Target : MonoBehaviour
     private static Colors GetColorFromSet(int setIndex, int colorIndex)
     {
         return (Colors)(setIndex * 5 + colorIndex);
+    }
+
+    public static Colors[] GetColorsInOrder(int colorCount)
+    {
+        if (colorCount <= 0)
+        {
+            return null;
+        }
+
+        Colors[] colors = new Colors[colorCount];
+
+        for (int i = 0; i < colorCount; i++)
+        {
+            colors[i] = (Colors)i;
+        }
+
+        return colors;
     }
 
     public static Colors[] GetColorMix(int colorCount)
