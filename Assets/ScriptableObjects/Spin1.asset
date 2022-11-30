@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53b2323f23382ad4687f5613b37095e8, type: 3}
+  m_Name: Spin1
+  m_EditorClassIdentifier: 
+  step00: 0
+  step01: 200
+  step02: 500
+  step03: 1000
+  step04: 1200
+  step05: 1200
+  step06: 1200
+  step07: 600
+  step08: 200
+  step09: 80
+  step10: 20
+  step11: 20

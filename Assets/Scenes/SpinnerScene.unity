@@ -1686,6 +1686,8 @@ MonoBehaviour:
   minSpeed: 0
   maxSpeed: 1200
   highlightedTarget: {fileID: 0}
+  spins:
+  - {fileID: 11400000, guid: 3e7f1e38876ed9c4b8e244032601ac67, type: 2}
 --- !u!4 &972142354
 Transform:
   m_ObjectHideFlags: 0
@@ -1714,6 +1716,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c11685402501d7045bbda9ed59689618, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spinButton: {fileID: 498046657}
 --- !u!1 &1016483220
 GameObject:
   m_ObjectHideFlags: 0
@@ -1842,6 +1845,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1123054389}
   - component: {fileID: 1123054390}
+  - component: {fileID: 1123054391}
   m_Layer: 0
   m_Name: Arrow
   m_TagString: Untagged
@@ -1880,6 +1884,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rotationSpeed: 400
   active: 1
+--- !u!111 &1123054391
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123054388}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations: []
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!1 &1147551543
 GameObject:
   m_ObjectHideFlags: 0

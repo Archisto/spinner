@@ -31,18 +31,26 @@ public class Spinner : MonoBehaviour
     [SerializeField]
     private Target highlightedTarget;
 
+    [SerializeField]
+    private SpinScriptableObject[] spins;
+
     private SpinnerArrow spinnerArrow;
     private PointsBank pointsBank;
     private List<Target> targets;
     private float targetSectorAngle;
 
-    public int TargetCount { get; set; }
+    public bool controlledSpinActive;
+    private SpinScriptableObject currentSpin;
+    private float spinSpeedMultiplier;
+    private float elapsedTime;
+
+    public int TargetCount { get; private set; }
 
     public Target SelectedTarget
     {
         get
         {
-            return !spinnerArrow.active || spinnerArrow.rotationSpeed <= 0
+            return !controlledSpinActive && (!spinnerArrow.active || spinnerArrow.rotationSpeed <= 0)
                 ? highlightedTarget
                 : null;
         }
@@ -75,6 +83,21 @@ public class Spinner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (controlledSpinActive)
+        {
+            if (elapsedTime >= SpinScriptableObject.SpinDuration)
+            {
+                elapsedTime = 0;
+                controlledSpinActive = false;
+                spinnerArrow.active = false;
+                SelectTarget(highlightedTarget, false);
+            }
+            else
+            {
+                elapsedTime += Time.deltaTime;
+                spinnerArrow.rotationSpeed = currentSpin.GetSpeedAt(elapsedTime, spinSpeedMultiplier);
+            }
+        }
     }
 
     public void SetTargetCountFromDropdown(int dropdownTargetCount)
@@ -84,6 +107,11 @@ public class Spinner : MonoBehaviour
 
     public void SetSpeed(float speedRatio)
     {
+        if (controlledSpinActive)
+        {
+            return;
+        }
+
         spinnerArrow.rotationSpeed = minSpeed + speedRatio * (maxSpeed - minSpeed);
 
         if (spinnerArrow.active && spinnerArrow.rotationSpeed == 0)
@@ -240,13 +268,49 @@ public class Spinner : MonoBehaviour
 
     public void SelectRandomTarget()
     {
+        if (controlledSpinActive)
+        {
+            return;
+        }
+
         Target randomTarget = targets[Random.Range(0, targets.Count)];
         HighlightTarget(randomTarget);
         SelectTarget(randomTarget, true);
     }
 
+    public void StartSpin()
+    {
+        if (controlledSpinActive)
+        {
+            return;
+        }
+
+        if (spinnerArrow.active)
+        {
+            ToggleSpin();
+        }
+        else
+        {
+            StartControlledSpin();
+        }
+    }
+
+    private void StartControlledSpin()
+    {
+        controlledSpinActive = true;
+        currentSpin = spins[Random.Range(0, spins.Length)];
+        spinSpeedMultiplier = currentSpin.GetRandomSpeedMultiplier();
+        spinnerArrow.rotationSpeed = currentSpin.GetSpeedAt(0);
+        spinnerArrow.active = true;
+    }
+
     public void ToggleSpin()
     {
+        if (controlledSpinActive)
+        {
+            return;
+        }
+
         if (spinnerArrow.rotationSpeed <= 0)
         {
             ResetSpeedSlider();

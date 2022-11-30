@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class InputController : MonoBehaviour
 {
-    Spinner spinner;
+    [SerializeField]
+    private SpinButton spinButton;
+
+    private Spinner spinner;
 
     // Start is called before the first frame update
     void Start()
@@ -37,7 +40,15 @@ public class InputController : MonoBehaviour
 
     private void UpdateInput()
     {
-        if (Input.GetButtonUp("Toggle Spin"))
+        if (Input.GetMouseButtonDown(0))
+        {
+            UpdateMouseClick();
+        }
+        else if (Input.GetButtonUp("Start Spin"))
+        {
+            spinner.StartSpin();
+        }
+        else if (Input.GetButtonUp("Toggle Spin"))
         {
             spinner.ToggleSpin();
         }
@@ -48,6 +59,23 @@ public class InputController : MonoBehaviour
         else if (Input.GetButtonUp("Add Points"))
         {
             spinner.AddPoints(spinner.SelectedTarget, 1);
+        }
+    }
+
+    private void UpdateMouseClick()
+    {
+        if (spinner.controlledSpinActive)
+        {
+            return;
+        }
+
+        Vector3 mouseInWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Rect rect = new Rect(spinButton.transform.position - spinButton.transform.localScale / 2,
+                             spinButton.transform.localScale);
+
+        if (rect.Contains(mouseInWorldPos))
+        {
+            spinner.StartSpin();
         }
     }
 
