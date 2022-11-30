@@ -34,8 +34,19 @@ public class Spinner : MonoBehaviour
     private SpinnerArrow spinnerArrow;
     private PointsBank pointsBank;
     private List<Target> targets;
-    private int targetCount;
     private float targetSectorAngle;
+
+    public int TargetCount { get; set; }
+
+    public Target SelectedTarget
+    {
+        get
+        {
+            return !spinnerArrow.active || spinnerArrow.rotationSpeed <= 0
+                ? highlightedTarget
+                : null;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -64,30 +75,6 @@ public class Spinner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        UpdateInput();
-    }
-
-    private void UpdateInput()
-    {
-        if (Input.GetKeyUp(KeyCode.Return))
-        {
-            CreateTargets(targetCount);
-        }
-        else if (Input.GetKeyUp(KeyCode.Space))
-        {
-            if (spinnerArrow.active)
-            {
-                SelectTarget(highlightedTarget, true);
-            }
-            else
-            {
-                spinnerArrow.active = true;
-            }
-        }
-        else if (Input.GetKeyUp(KeyCode.R))
-        {
-            SelectRandomTarget();
-        }
     }
 
     public void SetTargetCountFromDropdown(int dropdownTargetCount)
@@ -123,6 +110,12 @@ public class Spinner : MonoBehaviour
         }
     }
 
+    public void ResetSpeedSlider()
+    {
+        spinnerArrow.rotationSpeed = minSpeed + 0.5f * (maxSpeed - minSpeed);
+        speedSlider.SetValueWithoutNotify(0.5f);
+    }
+
     public void CreateTargets(int targetCount = 0)
     {
         if (targetPrefab == null)
@@ -134,7 +127,7 @@ public class Spinner : MonoBehaviour
 
         if (targetCount <= 0)
         {
-            this.targetCount = 0;
+            TargetCount = 0;
             return;
         }
         
@@ -143,7 +136,7 @@ public class Spinner : MonoBehaviour
             targetCount = 15;
         }
 
-        this.targetCount = targetCount;
+        TargetCount = targetCount;
         targets = new List<Target>(targetCount);
         targetSectorAngle = 360 / targetCount;
         Target.Colors[] colors = Target.GetColorsInOrder(targetCount);
@@ -185,7 +178,7 @@ public class Spinner : MonoBehaviour
 
     public void HighlightTarget(float angle)
     {
-        if (targets == null || targetCount <= 0)
+        if (targets == null || TargetCount <= 0)
         {
             return;
         }
@@ -205,11 +198,11 @@ public class Spinner : MonoBehaviour
             if (angle > (targetSectorAngle / 2))
             {
                 float angleFromLastIndex = angle - (targetSectorAngle / 2);
-                targetIndex = targetCount - (int)(angleFromLastIndex / targetSectorAngle) - 1;
+                targetIndex = TargetCount - (int)(angleFromLastIndex / targetSectorAngle) - 1;
             }
         }
 
-        if (targetIndex < 0 || targetIndex >= targetCount)
+        if (targetIndex < 0 || targetIndex >= TargetCount)
         {
             Debug.LogError("Invalid target index: " + targetIndex);
             return;
@@ -233,22 +226,49 @@ public class Spinner : MonoBehaviour
         highlightedTarget.Highlight(true);
     }
 
-    private void SelectTarget(Target target, bool snapToTarget, bool spinnerArrowHighlightsTarget = false)
+    public void SelectTarget(Target target, bool snapToTarget, bool spinnerArrowHighlightsTarget = false)
     {
         if (snapToTarget)
         {
             spinnerArrow.SnapTo(target.angle, spinnerArrowHighlightsTarget);
         }
 
-        target.SetPoints(pointsBank.AddPoints(target.TargetColor, 1));
+        AddPoints(target, 1);
 
         Debug.Log($"Target selected: {target.TargetColor.ToString()}, {pointsBank.GetPoints(target.TargetColor)} pts");
     }
 
-    private void SelectRandomTarget()
+    public void SelectRandomTarget()
     {
         Target randomTarget = targets[Random.Range(0, targets.Count)];
         HighlightTarget(randomTarget);
         SelectTarget(randomTarget, true);
+    }
+
+    public void ToggleSpin()
+    {
+        if (spinnerArrow.rotationSpeed <= 0)
+        {
+            ResetSpeedSlider();
+            spinnerArrow.active = true;
+        }
+        else if (spinnerArrow.active)
+        {
+            SelectTarget(highlightedTarget, true);
+        }
+        else
+        {
+            spinnerArrow.active = true;
+        }
+    }
+
+    public void AddPoints(Target target, int points)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        target.SetPoints(pointsBank.AddPoints(target.TargetColor, points));
     }
 }
