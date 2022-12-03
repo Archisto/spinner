@@ -7,11 +7,23 @@ public class Spinner : MonoBehaviour
 {
     public const int MaxTargetCount = 15;
 
+    private enum AspectRatio
+    {
+        Aspect16_9,
+        Aspect16_10,
+        Aspect5_4,
+        Aspect4_3,
+        Unknown
+    }
+
     [SerializeField]
     private Target targetPrefab;
 
     [SerializeField]
     private Dropdown targetCountDropdown;
+
+    [SerializeField]
+    private Dropdown aspectRatioDropdown;
 
     [SerializeField]
     private Slider speedSlider;
@@ -44,6 +56,8 @@ public class Spinner : MonoBehaviour
     private float spinSpeedMultiplier;
     private float elapsedTime;
 
+    private AspectRatio aspectRatio;
+
     public int TargetCount { get; private set; }
 
     public Dropdown TargetCountDropdown => targetCountDropdown;
@@ -66,6 +80,16 @@ public class Spinner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Resolution resolution = Screen.currentResolution;
+        aspectRatio = resolution.width == 1920 && resolution.height == 1080
+            ? AspectRatio.Aspect16_9
+            : resolution.width == 1280 && resolution.height == 800
+              ? AspectRatio.Aspect16_10
+              : AspectRatio.Unknown;
+
+        Debug.Log("Resolution: " + resolution.ToString() + "\n"
+                  + "Aspect ratio: " + aspectRatio.ToString());
+
         spinnerArrow = FindObjectOfType<SpinnerArrow>();
         pointsBank = FindObjectOfType<PointsBank>();
 
@@ -105,6 +129,62 @@ public class Spinner : MonoBehaviour
                 SetSpeed();
             }
         }
+    }
+
+    public void SetAspectRatioFromDropdown(int dropdownId)
+    {
+        Resolution resolution = new Resolution();
+        resolution.refreshRate = Screen.currentResolution.refreshRate;
+
+        switch (dropdownId)
+        {
+            case 0:
+            default:
+                if (aspectRatio == AspectRatio.Aspect16_9)
+                {
+                    return;
+                }
+
+                aspectRatio = AspectRatio.Aspect16_9;
+                resolution.width = 1920;
+                resolution.height = 1080;
+                break;
+            case 1:
+                if (aspectRatio == AspectRatio.Aspect16_10)
+                {
+                    return;
+                }
+
+                aspectRatio = AspectRatio.Aspect16_10;
+                resolution.width = 1280;
+                resolution.height = 800;
+                break;
+            case 2:
+                if (aspectRatio == AspectRatio.Aspect5_4)
+                {
+                    return;
+                }
+
+                aspectRatio = AspectRatio.Aspect5_4;
+                resolution.width = 1000;
+                resolution.height = 800;
+                break;
+            case 3:
+                if (aspectRatio == AspectRatio.Aspect4_3)
+                {
+                    return;
+                }
+
+                aspectRatio = AspectRatio.Aspect4_3;
+                resolution.width = 800;
+                resolution.height = 600;
+                break;
+        }
+
+        Debug.Log("New resolution: " + resolution.ToString() + "\n"
+                  + "New aspect ratio: " + aspectRatio.ToString());
+
+        Screen.SetResolution(resolution.width, resolution.height, true);
     }
 
     public void SetTargetCountFromDropdown(int dropdownTargetCount)
