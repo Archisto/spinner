@@ -23,6 +23,8 @@ public class SpinScriptableObject : ScriptableObject
     public float step10;
     public float step11;
 
+    private float[] steps;
+
     public float GetRandomSpeedMultiplier()
     {
         return Random.Range(MinSpeedMultiplier, MaxSpeedMultiplier);
@@ -30,6 +32,8 @@ public class SpinScriptableObject : ScriptableObject
 
     public float GetSpeedAt(float time, float speedMultiplier = 1)
     {
+        // TODO: Smooth transitions between steps
+
         float ratio = time / SpinDuration;
         int step = (int)(12 * ratio);
 
@@ -42,21 +46,24 @@ public class SpinScriptableObject : ScriptableObject
             return 0;
         }
 
-        float[] steps = new float[]
+        if (steps == null || steps.Length == 0)
         {
-            step00,
-            step01,
-            step02,
-            step03,
-            step04,
-            step05,
-            step06,
-            step07,
-            step08,
-            step09,
-            step10,
-            step11
-        };
+            steps = new float[]
+            {
+                step00,
+                step01,
+                step02,
+                step03,
+                step04,
+                step05,
+                step06,
+                step07,
+                step08,
+                step09,
+                step10,
+                step11
+            };
+        }
 
         return steps[step] * speedMultiplier;
     }

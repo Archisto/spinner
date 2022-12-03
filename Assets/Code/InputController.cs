@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InputController : MonoBehaviour
 {
@@ -35,10 +34,18 @@ public class InputController : MonoBehaviour
     void Update()
     {
         UpdateDebugInput();
-        UpdateInput();
+
+        if (EventSystem.current.currentSelectedGameObject != null)
+        {
+            UpdateMenuInput();
+        }
+        else
+        {
+            UpdateGameInput();
+        }
     }
 
-    private void UpdateInput()
+    private void UpdateGameInput()
     {
         if (Input.GetMouseButtonDown(0))
         {
@@ -50,7 +57,11 @@ public class InputController : MonoBehaviour
         }
         else if (Input.GetButtonUp("Toggle Spin"))
         {
-            spinner.ToggleSpin();
+            spinner.ToggleSpin(true);
+        }
+        else if (spinner.SpinningWithFixedSpeed && Input.GetButtonUp("Cancel"))
+        {
+            spinner.ToggleSpin(false);
         }
         else if (Input.GetButtonUp("Select Random Target"))
         {
@@ -59,6 +70,23 @@ public class InputController : MonoBehaviour
         else if (Input.GetButtonUp("Add Points"))
         {
             spinner.AddPoints(spinner.SelectedTarget, 1);
+        }
+        else if (Input.GetButtonUp("Open Menu"))
+        {
+            spinner.DefaultMenuElement.Select();
+        }
+    }
+
+    private void UpdateMenuInput()
+    {
+        if (Input.GetButtonUp("Cancel"))
+        {
+            if (spinner.TargetCountDropdown.IsActive())
+            {
+                spinner.TargetCountDropdown.Hide();
+            }
+
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 

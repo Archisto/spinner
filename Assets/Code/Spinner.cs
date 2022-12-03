@@ -46,6 +46,13 @@ public class Spinner : MonoBehaviour
 
     public int TargetCount { get; private set; }
 
+    public Dropdown TargetCountDropdown => targetCountDropdown;
+
+    public Selectable DefaultMenuElement => targetCountDropdown;
+
+    public bool SpinningWithFixedSpeed =>
+        spinnerArrow.active && !controlledSpinActive && spinnerArrow.rotationSpeed > 0;
+
     public Target SelectedTarget
     {
         get
@@ -71,7 +78,7 @@ public class Spinner : MonoBehaviour
         if (speedSlider != null)
         {
             speedSlider.SetValueWithoutNotify(0.5f);
-            SetSpeed(speedSlider.value);
+            //SetSpeed(speedSlider.value);
         }
 
         if (pointsVisibilityToggle != null)
@@ -95,7 +102,7 @@ public class Spinner : MonoBehaviour
             else
             {
                 elapsedTime += Time.deltaTime;
-                spinnerArrow.rotationSpeed = currentSpin.GetSpeedAt(elapsedTime, spinSpeedMultiplier);
+                SetSpeed();
             }
         }
     }
@@ -105,10 +112,11 @@ public class Spinner : MonoBehaviour
         CreateTargets(dropdownTargetCount + 2);
     }
 
-    public void SetSpeed(float speedRatio)
+    public void SetSpeed(float speedRatio = 0)
     {
         if (controlledSpinActive)
         {
+            spinnerArrow.rotationSpeed = currentSpin.GetSpeedAt(elapsedTime, spinSpeedMultiplier);
             return;
         }
 
@@ -126,22 +134,6 @@ public class Spinner : MonoBehaviour
         {
             target.SetPointsVisibility(visible);
         }
-    }
-
-    public void ResetPoints()
-    {
-        pointsBank.ResetPoints();
-
-        foreach (Target target in targets)
-        {
-            target.SetPoints(pointsBank.GetPoints(target.TargetColor));
-        }
-    }
-
-    public void ResetSpeedSlider()
-    {
-        spinnerArrow.rotationSpeed = minSpeed + 0.5f * (maxSpeed - minSpeed);
-        speedSlider.SetValueWithoutNotify(0.5f);
     }
 
     public void CreateTargets(int targetCount = 0)
@@ -287,7 +279,7 @@ public class Spinner : MonoBehaviour
 
         if (spinnerArrow.active)
         {
-            ToggleSpin();
+            ToggleSpin(true);
         }
         else
         {
@@ -304,7 +296,7 @@ public class Spinner : MonoBehaviour
         spinnerArrow.active = true;
     }
 
-    public void ToggleSpin()
+    public void ToggleSpin(bool selectHighlightedTarget)
     {
         if (controlledSpinActive)
         {
@@ -318,7 +310,14 @@ public class Spinner : MonoBehaviour
         }
         else if (spinnerArrow.active)
         {
-            SelectTarget(highlightedTarget, true);
+            if (selectHighlightedTarget)
+            {
+                SelectTarget(highlightedTarget, true);
+            }
+            else
+            {
+                spinnerArrow.active = false;
+            }
         }
         else
         {
@@ -334,5 +333,21 @@ public class Spinner : MonoBehaviour
         }
 
         target.SetPoints(pointsBank.AddPoints(target.TargetColor, points));
+    }
+
+    public void ResetPoints()
+    {
+        pointsBank.ResetPoints();
+
+        foreach (Target target in targets)
+        {
+            target.SetPoints(pointsBank.GetPoints(target.TargetColor));
+        }
+    }
+
+    public void ResetSpeedSlider()
+    {
+        spinnerArrow.rotationSpeed = minSpeed + 0.5f * (maxSpeed - minSpeed);
+        speedSlider.SetValueWithoutNotify(0.5f);
     }
 }
